@@ -10,9 +10,18 @@ function App() {
   // 빈 배열을 초깃값으로 coins 변수 생성
   const [coins, updateCoins] = useState([])
 
-  // API 호출을 위한 fetchCoins 함수 정의
+  // limit 및 start에 대한 사용자 입력을 저장할 상태 추가
+  const [input, updateInput] = useState({ limit:5, start:0 })
+
+  // 사용자가 입력 값을 수정할 수 있도록 함수 생성
+  function updateInputValues(type, value) {
+    updateInput({ ...input, [type]: value })
+  }
+
+  // limit 및 start를 이용하도록 fetchCoins 함수 수정
   async function fetchCoins() {
-    const data = await API.get('cryptoapi', '/coins')
+    const { limit, start } = input
+    const data = await API.get('cryptoapi', `/coins?limit=${limit}&start=${start}`)
     updateCoins(data.coins)
   }
 
@@ -20,6 +29,7 @@ function App() {
   useEffect(() => {
     fetchCoins()
   }, [])
+
 
   return (
     <div className='App'>
@@ -31,6 +41,18 @@ function App() {
           </div>
         ))
       }
+
+      <input
+        onChange={e => updateInputValues('limit', e.target.value)}
+        placeholder="limit"
+      />
+
+      <input
+        placeholder="start"
+        onChange={e => updateInputValues('start', e.target.value)}
+      />
+
+      <button onClick={fetchCoins}>Fetch Coins</button>
     </div>
   );
 }
